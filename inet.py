@@ -18,9 +18,8 @@ class INet(Cmd):
     
     def do_login(self, line):
         url = self.client.get_authorize_url()
-        print url
-        code = raw_input('code:')
-        print code
+        print "Go to authorize in web browser:", url
+        code = raw_input('code: ')
         r = self.client.request_access_token(code)
         access_token = r.access_token
         expires_in = r.expires_in
@@ -34,7 +33,13 @@ class INet(Cmd):
         self.client.set_access_token(access_token, expires_in)
 
     def do_timeline(self, line):
-        print self.client.statuses.user_timeline.get()
+        timeline = self.client.statuses.user_timeline.get()
+        for s in timeline.statuses:
+            print 80 * '*'
+            print s.created_at
+            print s.user.screen_name
+            print s.text
+            print s.source
 
 
 if __name__=='__main__':

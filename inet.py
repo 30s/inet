@@ -2,6 +2,14 @@ from cmd import Cmd
 from weibo import APIClient
 
 
+def print_status(s):
+    print 80 * '*'
+    print s.created_at
+    print s.user.screen_name
+    print s.text
+    print s.source
+    
+
 class INet(Cmd):
     def __init__(self):
         Cmd.__init__(self)
@@ -29,14 +37,21 @@ class INet(Cmd):
         expires_in = r['expires_in']
         self.client.set_access_token(access_token, expires_in)
 
+    def do_tl(self, line):
+        self.do_timeline(line)
+
     def do_timeline(self, line):
         timeline = self.client.statuses.user_timeline.get()
         for s in timeline.statuses:
-            print 80 * '*'
-            print s.created_at
-            print s.user.screen_name
-            print s.text
-            print s.source
+            print_status(s)
+
+    def do_ft(self, line):
+        self.do_friends_timeline(line)
+
+    def do_friends_timeline(self, line):
+        timeline = self.client.statuses.friends_timeline.get()
+        for s in timeline.statuses:
+            print_status(s)
 
 
 if __name__=='__main__':

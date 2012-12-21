@@ -3,7 +3,10 @@ from weibo import APIClient
 
 
 def print_status(s):
+    if s.has_key('deleted') and s.deleted == u'1':
+        return
     print 80 * '*'
+    print s.idstr
     print s.created_at
     print s.user.screen_name
     print s.text
@@ -52,6 +55,41 @@ class INet(Cmd):
         timeline = self.client.statuses.friends_timeline.get()
         for s in timeline.statuses:
             print_status(s)
+
+    def do_fav(self, line):
+        self.do_favorites(line)
+
+    def do_favorites(self, line):
+        resp = self.client.favorites.get()
+        for f in resp.favorites:
+            print_status(f.status)
+
+    def do_destroy_favorite(self, line):
+        resp = self.client.favorites.destroy.post(id=int(line))        
+
+    def do_dfav(self, line):
+        self.do_destroy_favorite(line)
+
+    def help_favtags(self):
+        print "tags for favorites"
+
+    def do_favtags(self, line):
+        resp = self.client.favorites.tags.get()
+        for t in resp.tags:
+            print ":".join([str(t.id), t.tag, str(t.count)])
+
+    def do_tags(self, line):
+        resp = self.client.tags.get(uid=TOKEN['uid'])
+        print resp
+
+    def do_unread(self, line):
+        resp = self.client.remind.unread_count.get(uid=TOKEN['uid'])
+        print resp
+
+    def do_trends(self, line):
+        resp = self.client.trends.get(uid=TOKEN['uid'])
+        for t in resp:
+            print t.trend_id, ":", t.hotword
 
 
 if __name__=='__main__':

@@ -1,4 +1,8 @@
+import os
+
 from cmd import Cmd
+from datetime import datetime, timedelta
+
 from weibo import APIClient
 
 
@@ -10,7 +14,7 @@ def print_status(s):
     print s.created_at
     print s.user.screen_name
     print s.text
-    print s.source
+    print s.source    
     
 
 class INet(Cmd):
@@ -52,10 +56,24 @@ class INet(Cmd):
         self.do_friends_timeline(line)
 
     def do_friends_timeline(self, line):
-        timeline = self.client.statuses.friends_timeline.get()
-        for s in timeline.statuses:
-            print_status(s)
-
+        now = datetime.now()
+        end, cur, max_id, timeline = now, None, None, None
+        if line != '':
+            end = now - timedelta(hours=int(line))
+        while True:
+            if max_id is None:
+                timeline = self.client.statuses.friends_timeline.get()
+            else:
+                timeline = self.client.statuses.friends_timeline.get(
+                    max_id=max_id)
+            for s in timeline.statuses:
+                print_status(s)
+                cur = datetime.strptime(s.created_at, 
+                                        '%a %b %d %H:%M:%S +0800 %Y')
+                max_id = s.idstr
+            if cur < end:
+                break
+                
     def do_fav(self, line):
         self.do_favorites(line)
 

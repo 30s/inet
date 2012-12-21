@@ -1,8 +1,5 @@
 from cmd import Cmd
-
 from weibo import APIClient
-
-from settings_ax003d import APP_KEY, APP_SECRET, CALLBACK_URL, TOKEN
 
 
 class INet(Cmd):
@@ -43,6 +40,17 @@ class INet(Cmd):
 
 
 if __name__=='__main__':
+    import sys
+    import getopt
+    settings = "settings"
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], '', 'settings=')
+        for opt, arg in opts:
+            if opt in ["--settings"]:
+                settings = arg
+    except getopt.GetoptError:
+        print "usage"
+    exec "from %s import APP_KEY, APP_SECRET, CALLBACK_URL, TOKEN" % settings
     inet = INet()
     inet.cmdloop()
 
